@@ -1,12 +1,18 @@
 import { defineConfig } from '@playwright/test';
 import dotenv from 'dotenv';
+import path from 'path';
 
+// Hydrate local variables if the file exists (will safely do nothing in CI)
 dotenv.config();
 
-// Encode Email and API Token to Base64 for Jira Basic Authentication
-const auth = Buffer.from(
-    `${process.env.JIRA_USER_EMAIL}:${process.env.JIRA_API_TOKEN}`
-).toString('base64');
+const email = process.env.JIRA_USER_EMAIL;
+const token = process.env.JIRA_API_TOKEN;
+const baseUrl = process.env.JIRA_BASE_URL;
+
+// Generate the authorization header safely only if variables are populated
+const auth = email && token
+    ? Buffer.from(`${email}:${token}`).toString('base64')
+    : '';
 
 export default defineConfig({
     testDir: './tests',
@@ -17,7 +23,8 @@ export default defineConfig({
     fullyParallel: true,
     reporter: 'html',
     use: {
-        baseURL: `${process.env.JIRA_BASE_URL}/rest/api/3`,
+        // Fallback guard ensures an empty string doesn't break path evaluation syntax
+        baseURL: baseUrl ? `${baseUrl}/rest/api/3` : 'https://localhost/rest/api/3',
         extraHTTPHeaders: {
             'Authorization': `Basic ${auth}`,
             'Content-Type': 'application/json',
