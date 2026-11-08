@@ -1,6 +1,5 @@
 import { defineConfig } from '@playwright/test';
 import dotenv from 'dotenv';
-import path from 'path';
 
 // Hydrate local variables if the file exists (will safely do nothing in CI)
 dotenv.config();
@@ -30,5 +29,10 @@ export default defineConfig({
             'Content-Type': 'application/json',
             'Accept': 'application/json',
         },
+
+        // Artifacts configurations (Optimized for troubleshooting failures)
+        trace: 'retain-on-failure',      // Records a full network/action trace only if a test fails
+        screenshot: 'only-on-failure', // Takes a screenshot only on failure (useful if using page fixtures)
+        video: 'retain-on-failure',    // Records video but deletes it if the test passes successfully
     },
 });
