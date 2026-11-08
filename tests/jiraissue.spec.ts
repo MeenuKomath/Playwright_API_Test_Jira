@@ -54,9 +54,10 @@ test.describe('Jira Issue API - Isolated Operation Validation', () => {
 
         const response = await jira.updateIssue(createdIssueKey, { summary: updatedSummary });
         expect(response.status()).toBe(204);
-
+        
         // API verification check to verify update persistence
         const verifyRes = await jira.getIssue(createdIssueKey);
+        expect(verifyRes.status()).toBe(200);
         const verifyBody = await verifyRes.json();
         expect(verifyBody.fields.summary).toBe(updatedSummary);
 

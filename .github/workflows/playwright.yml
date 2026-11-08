@@ -10,24 +10,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
+        
     - name: Install dependencies
       run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
       
     - name: Run Playwright tests
-      # This block injects your GitHub Secrets into process.env at runtime
+      # Injects your secret tokens into process.env at runtime
       env:
-        JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
-        JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
-        JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+        JIRA_DOMAIN: ${{ secrets.JIRA_DOMAIN }}
+        JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+        JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
         JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }} 
       run: npx playwright test
       
-    - uses: actions/upload-artifact@v4
+    - name: Upload Test Report
+      uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
         name: playwright-report
